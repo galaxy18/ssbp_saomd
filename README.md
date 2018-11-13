@@ -1,13 +1,12 @@
 
-# Convert and Assemble Sprite from .ssbp
+# Convert and Assemble Sprite from .ssbp based on /mlho/ssbp-converter
 
-## \*\* ONLY Supports SpriteStudio5 DATA_VERSION 3 .ssbp files \*\*
-
+## \*\* ONLY Supports SpriteStudio5 DATA_VERSION 2 .ssbp files \*\*
 
 ## Known Issues
 - Vertex Transforms are not performed(can cause parts overlapping and incorrect sizing/positioning)
 - Weapons and other Option parts/animations(Capes, Tails, Effects) are not drawn together
-
+- rename image files in both cellsArray.js and textureURLArray.js to change character
 
 ## Requirements
 - [npm](https://nodejs.org/en/)
