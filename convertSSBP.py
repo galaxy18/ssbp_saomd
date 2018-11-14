@@ -70,7 +70,7 @@ TOP_LUMP = collections.OrderedDict([
     ('cellListSize', 'SHORT'),
     ('animeListSize', 'SHORT'),
     ('effectFileSize', 'SHORT')
-])#OK
+])
 
 CELL = collections.OrderedDict([
     ('name', 'STRING'),
@@ -83,7 +83,7 @@ CELL = collections.OrderedDict([
     ('RESERVED', 'SHORT'),
     ('pivotX', 'FLOAT'),
     ('pivotY', 'FLOAT')
-])#OK
+])
 
 CELL_MAP = collections.OrderedDict([
     ('name', 'STRING'),
@@ -92,7 +92,7 @@ CELL_MAP = collections.OrderedDict([
     ('wrapMode', 'SHORT'),
     ('filterMode', 'SHORT'),
     ('RESERVED', 'SHORT')
-])#OK
+])
 
 ANIME_PACK = collections.OrderedDict([
     ('name', 'STRING'),
@@ -100,7 +100,7 @@ ANIME_PACK = collections.OrderedDict([
     ('animeDataArray', 'INT'),
     ('partListSize', 'SHORT'),
     ('animeListSize', 'SHORT')
-])#OK
+])
 
 PART = collections.OrderedDict([
     ('name', 'STRING'),
@@ -337,10 +337,10 @@ def get_anime_data_array(data, index, num_anime, num_parts):
                 val = get_initial_data_array(data, val, num_parts)
 
             lump.update({key : val})
-            try:
+            #try:
                 #print('DEBUG INFO get_anime_data_array:  '+str(key)+': '+str(val))
-            except:
-                print('DEBUG INFO get_anime_data_array:  ENCODING ERROR: '+str(key))
+            #except:
+                #print('DEBUG INFO get_anime_data_array:  ENCODING ERROR: '+str(key))
         
         index_list = get_frame_data_index_array(data, lump['frameDataIndexArray'], lump['animeEndFrame'])
 
