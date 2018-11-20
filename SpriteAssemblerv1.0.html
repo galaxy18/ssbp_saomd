@@ -6,7 +6,8 @@
   <script src="textureURLArray.js"></script>
   <script src="partsJSON.js"></script>
   <script src="initialAnimeJSON.js"></script>
-  <script src="framesJSON.js"></script>
+  <!--script src="framesJSON.js"></script-->
+  <script src="framesJSON_levelup_m.js"></script>
 
   <style>
     body {
@@ -210,6 +211,14 @@
           ctx.scale(1, -1);
           flipV = -1;
         }
+        /*if (animObj.flip_h){
+          ctx.scale(-1, 1);
+          flipH = -1;
+        }
+        if (animObj.flip_v){
+          ctx.scale(1, -1);
+          flipV = -1;
+        }*/
 
         var scaleX = 1;
         var scaleY = 1;
@@ -258,23 +267,25 @@
             //if (animePackName != 'chara_15_rod_m') continue;
             //if (animePackName != 'chara_51_yui') continue;//TODO
 
-            console.log('[animePackName]', animePackName);
+            if (framesJSON[animePackName]){
+                console.log('[animePackName]', animePackName);
 
-            var parts = partsJSON[animePackName];
+                var parts = partsJSON[animePackName];
 
-            var anim = initialAnimeJSON[animePackName];
-            console.log('[animeDataArray]', anim);
-            for (var n = 0; n < anim.length; n++) {
-              var pose = Object.keys(anim[n])[0];
-              console.log('[pose] ' + pose);
-              //if (pose != 'walk') continue;
-              //if (pose != 'gesture') continue;//TODO
-              var option = document.createElement("option");
-              option.text = pose;
-              option.value = animePackName+','+n;
-              poselist.add(option);
-              //document.getElementById('assembled-wrapper').appendChild(document.createElement('br'));
-              //document.getElementById('assembled-wrapper').appendChild(document.createElement('hr'));
+                var anim = initialAnimeJSON[animePackName];
+                console.log('[animeDataArray]', anim);
+                for (var n = 0; n < anim.length; n++) {
+                  var pose = Object.keys(anim[n])[0];
+                  console.log('[pose] ' + pose);
+                  //if (pose != 'walk') continue;
+                  //if (pose != 'gesture') continue;//TODO
+                  var option = document.createElement("option");
+                  option.text = pose;
+                  option.value = animePackName+','+n;
+                  poselist.add(option);
+                  //document.getElementById('assembled-wrapper').appendChild(document.createElement('br'));
+                  //document.getElementById('assembled-wrapper').appendChild(document.createElement('hr'));
+                }
             }
         }
         var canvasCtn = document.createElement('div');
@@ -299,6 +310,8 @@
             stopplaying = lastanimeid;
             setPose(gridOpt, parts, ctx);
         });
+        
+        setPose(gridOpt, parts, ctx);
     }
 
     function setPose(gridOpt, parts, ctx){
@@ -382,7 +395,7 @@
                     var part = parts[i];
                     
                     if (part){
-                    //if (i==18||i==19){
+                    //if (i>=15&&i<=17){
                         //console.error(i);
                         drawPartAt(animation, obj, parentPosition[part.parentIndex], parts, ctx);
                     //}

@@ -112,7 +112,7 @@ PART = collections.OrderedDict([
     ('refAnimeLength', 'SHORT'),
     ('refAnime', 'STRING'),
     ('effectName', 'STRING'),
-    #('colorLabel', 'STRING') #not been used
+    #('colorLabel', 'STRING') #not been used #static_cast<const char*>(ptr(partData->colorLabel));
 ])
 
 ANIME_DATA = collections.OrderedDict([
@@ -241,7 +241,7 @@ def get_top_lump(data):
 
         lump.update({key : val})
         
-        print('DEBUG INFO get_top_lump:  '+str(key)+': '+str(val))
+        #print('DEBUG INFO get_top_lump:  '+str(key)+': '+str(val))
 
     return lump
 
@@ -711,9 +711,12 @@ def main():
         pprint.pprint(initial_data_json, out)
     print('[OK] initialAnimeJSON.js')
 
-    with open('framesJSON.js', 'wt') as out:
-        out.write('var framesJSON = ')
-        pprint.pprint(frame_data_json, out)
+    for animation in frame_data_json:
+        with open('framesJSON_'+animation+'.js', 'wt') as out:
+            out.write("var framesJSON = {'"+animation+"': ")
+            pprint.pprint(frame_data_json[animation], out)
+            out.write("}")
+        
     print('[OK] framesJSON.js')
 
     print('Done.')
