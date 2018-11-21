@@ -7,7 +7,11 @@
   <script src="partsJSON.js"></script>
   <script src="initialAnimeJSON.js"></script>
   <!--script src="framesJSON.js"></script-->
-  <script src="framesJSON_levelup_m.js"></script>
+  <script src="framesJSON_chara_1_wait.js"></script>
+  <script type="text/javascript" src="LZWEncoder.js"></script>
+  <script type="text/javascript" src="NeuQuant.js"></script>
+  <script type="text/javascript" src="GIFEncoder.js"></script>
+  <script type="text/javascript" src="b64.js"></script>
 
   <style>
     body {
@@ -64,14 +68,15 @@
     </div>
   <button id="grid-btn" class="btn"> SHOW GRID </button>
   <br>
-  <br> Width: <input id="width-input" type="text" value="800"> Height: <input id="height-input" type="text" value="800">
+  <br> Width: <input id="width-input" type="text" value="600"> Height: <input id="height-input" type="text" value="400">
   <br>
-  <br> X: <input id="x-input" type="text" value="0"> Y: <input id="y-input" type="text" value="0">
+  <br> X: <input id="x-input" type="text" value="0"> Y: <input id="y-input" type="text" value="-160">
   <br>
   <br>
   <button id="resize-btn" class="btn"> RESIZE </button><br>
   <br>
   <select id="pose">
+    <option>--</option>
   </select>
   <div id="assembled-wrapper"></div>
 
@@ -306,35 +311,45 @@
         }
         ctx.translate(STARTX, STARTY);
 
+        canvasCtn = document.createElement('div');
+        canvasCtn.classList.add('ctn');
+        document.getElementById('assembled-wrapper').appendChild(canvasCtn);
+
         poselist.addEventListener("change", function(){
             stopplaying = lastanimeid;
-            setPose(gridOpt, parts, ctx);
+            setPose(gridOpt, parts, ctx, canvasCtn);
         });
         
-        setPose(gridOpt, parts, ctx);
+        //setPose(gridOpt, parts, ctx, canvasCtn);
     }
 
-    function setPose(gridOpt, parts, ctx){
+    function setPose(gridOpt, parts, ctx, canvasCtn){
         /*var header = document.createElement('h1');
         header.innerHTML = pose;
         document.getElementById('assembled-wrapper').appendChild(header);*/
         
         var poselist = document.getElementById("pose");
         var pose = poselist.options[poselist.selectedIndex].text;
+        
+        if (poselist.options[poselist.selectedIndex].value === '--') return;
+        
         var n = poselist.options[poselist.selectedIndex].value.split(',')[1];
         var animePackName = poselist.options[poselist.selectedIndex].value.split(',')[0];
         var anim = initialAnimeJSON[animePackName];
 
         var animation = anim[n][pose];
-
-        lastanimeid = createanime(parts, animation, animePackName, n, pose, ctx);
+        
+        lastanimeid = createanime(parts, animation, animePackName, n, pose, ctx, canvasCtn);
     }
 
-    function createanime(parts, animation, animePackName, n, pose, ctx){
+    function createanime(parts, animation, animePackName, n, pose, ctx, canvasCtn){
         var start = null;
         var state = 0;
         var drawOrder = [];
         var orderMapping = {};
+        var updateframes = true;
+        
+        canvasCtn.innerHTML = "";
         
         // generate parent data
         var parentPosition = [];
@@ -344,7 +359,29 @@
             parentPosition[i] = parentPosition[part.parentIndex].concat(i);
         }
         var oldAnimation = animation.slice();
+        
+        var encoder = new GIFEncoder();
+        encoder.setRepeat(0);
+        encoder.setDelay(1000/30);
+        encoder.setTransparent(0x000000);
+        encoder.start();
+        
         function step(timestamp) {
+            var ctx2;
+            if(updateframes){
+                var canvas = document.createElement('canvas');
+                canvas.id = 'sprite-' + pose +'_'+ state;
+                canvas.width = WIDTH;
+                canvas.height = HEIGHT;
+                canvas.style.border = '1px solid #000';
+                canvas.style.display = 'none';
+                canvasCtn.appendChild(canvas);
+
+                var ctx2 = canvas.getContext("2d");
+                ctx2.translate(WIDTH / 2, HEIGHT / 2);
+                ctx2.translate(STARTX, STARTY);
+            }
+        
             ctx.save();
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.clearRect(0, 0, 800, 800);
@@ -398,18 +435,35 @@
                     //if (i>=15&&i<=17){
                         //console.error(i);
                         drawPartAt(animation, obj, parentPosition[part.parentIndex], parts, ctx);
+                        if(updateframes){
+                            drawPartAt(animation, obj, parentPosition[part.parentIndex], parts, ctx2);
+                        }
                     //}
                     }
+                }
+                if(updateframes){
+                    encoder.addFrame(ctx);
                 }
             }
             state += 1;
             
-            if (state >= framesJSON[animePackName][n][pose].length){state = 0;}
-            //else
+            if (state >= framesJSON[animePackName][n][pose].length){
+                state = 0;
+                if (updateframes){
+                    updateframes = false;
+                    encoder.finish();
+                    var binary_gif = encoder.stream().getData() //notice this is different from the as3gif package!
+                    var data_url = 'data:image/gif;base64,'+encode64(binary_gif);
+                    var templink = encoder.download("download.gif");
+                    canvasCtn.appendChild(templink);
+                }
+            }
+            //else{
                 setTimeout(function(){
                     if (stopplaying != randomid)
                         window.requestAnimationFrame(step);
                 }, 1000/30);
+            //}
         }
         window.requestAnimationFrame(step);
         var randomid = Math.floor(Math.random()*100);
