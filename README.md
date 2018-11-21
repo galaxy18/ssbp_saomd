@@ -1,5 +1,8 @@
 
-# Convert and Assemble Sprite from .ssbp based on /mlho/ssbp-converter
+# Convert and Assemble Sprite from .ssbp
+
+### based on /mlho/ssbp-converter
+### convert to gif based on /antimatter15/jsgif
 
 ## \*\* ONLY Supports SpriteStudio5 DATA_VERSION 2 .ssbp files \*\*
 
